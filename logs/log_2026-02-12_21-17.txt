@@ -1,0 +1,8 @@
+[[02/12/2026 09:18:05 PM]] 127.0.0.1 - - [12/Feb/2026 21:18:05] "POST /generate HTTP/1.1" 200 -
+[[02/12/2026 09:18:16 PM]] 127.0.0.1 - - [12/Feb/2026 21:18:16] "POST /download-pdf HTTP/1.1" 200 -
+[[02/12/2026 09:18:22 PM]] 127.0.0.1 - - [12/Feb/2026 21:18:22] "POST /download-pdf HTTP/1.1" 200 -
+[[02/12/2026 09:18:50 PM]] 127.0.0.1 - - [12/Feb/2026 21:18:50] "POST /download-pdf HTTP/1.1" 200 -
+[[02/12/2026 09:18:50 PM]] 127.0.0.1 - - [12/Feb/2026 21:18:50] "POST /download-pdf HTTP/1.1" 200 -
+[[02/12/2026 09:18:51 PM]] 127.0.0.1 - - [12/Feb/2026 21:18:51] "POST /download-pdf HTTP/1.1" 200 -
+[[02/12/2026 09:18:52 PM]] 127.0.0.1 - - [12/Feb/2026 21:18:52] "POST /download-pdf HTTP/1.1" 200 -
+[[02/12/2026 09:23:54 PM]]  * Detected change in 'C:\\Users\\rajen\\Downloads\\handwriting-synthesis-master\\incomplete\\handwriting-synthesis-master\\templates\\sample.py', reloading

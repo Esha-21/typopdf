@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypoPDF – Handwriting Generator</title>
+    
+    <!-- Canvas Confetti Library for Crackers Animation -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- jsPDF: build PDF entirely in the browser, zero server involvement -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px dashed #dee2e6;
+        }
+
+        .section h2 {
+            color: #495057;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3em;
+        }
+
+        .section h2::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+        }
+
+        .upload-area {
+            border: 3px dashed #ced4da;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .upload-area.has-image {
+            padding: 10px;
+        }
+
+        .upload-placeholder {
+            font-size: 1em;
+            color: #6c757d;
+        }
+
+        .upload-placeholder.hide {
+            display: none;
+        }
+
+        #paperPreview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        #paperPreview.show {
+            display: block;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="range"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border 0.3s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+            font-family: inherit;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+            color: white;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .preview-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .preview-placeholder {
+            text-align: center;
+            color: #6c757d;
+        }
+
+        .preview-placeholder.hide {
+            display: none;
+        }
+
+        #previewImage {
+            max-width: 100%;
+            max-height: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        #previewImage.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: #667eea;
+            transform: scale(1.15);
+        }
+
+        .slider-value {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 5px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>TypoPDF</h1>
+            <p>9 Styles • Multi-Lines • Vertical Flow</p>
+        </div>
+
+        <div class="content">
+            <!-- Controls -->
+            <div>
+                <!-- Text Input -->
+                <div class="section">
+                    <h2>✍️ Your Text</h2>
+                    <div class="control-group">
+                        <label>Enter your text below:</label>
+                        <textarea 
+                            id="textInput" 
+                            placeholder="Type or paste your text here...&#10;&#10;You can write multiple lines and paragraphs.&#10;The handwriting will flow naturally from top to bottom."
+                        ></textarea>
+                    </div>
+                </div>
+
+                <!-- Page Style -->
+                <div class="section" style="margin-top: 20px;">
+                    <h2>📄 Page Style</h2>
+                    <div class="button-group" style="grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-primary" onclick="selectPageStyle('custom')" id="btnCustom">
+                            Custom Paper
+                        </button>
+                        <button class="btn btn-secondary" onclick="selectPageStyle('white')" id="btnWhite">
+                            Pure White
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Upload Paper -->
+                <div class="section" id="uploadSection" style="margin-top: 20px;">
+                    <h2>📁 Upload Paper</h2>
+                    <div class="upload-area" id="uploadArea" onclick="document.getElementById('paperInput').click()">
+                        <div class="upload-placeholder" id="uploadPlaceholder">
+                            <p style="font-size: 3em; margin-bottom: 10px;">🖼️</p>
+                            <p style="font-size: 1.1em; margin-bottom: 5px;">Click to upload paper background</p>
+                            <p style="font-size: 0.9em; color: #999;">Supports: JPG, PNG</p>
+                        </div>
+                        <img id="paperPreview" alt="Paper preview">
+                    </div>
+                    <input type="file" id="paperInput" accept="image/*" style="display: none;" onchange="handlePaperUpload(event)">
+                </div>
+
+                <!-- Ink Color -->
+                <div class="section" style="margin-top: 20px;">
+                    <h2>🎨 Ink Color</h2>
+                    <div class="color-picker-wrapper">
+                        <div class="color-option selected" style="background: #000000;" onclick="selectColor('#000000', this)" data-color="#000000"></div>
+                        <div class="color-option" style="background: #0000FF;" onclick="selectColor('#0000FF', this)" data-color="#0000FF"></div>
+                        <div class="color-option" style="background: #FF0000;" onclick="selectColor('#FF0000', this)" data-color="#FF0000"></div>
+                        <div class="color-option" style="background: #00008B;" onclick="selectColor('#00008B', this)" data-color="#00008B"></div>
+                        <div class="color-option" style="background: #8B0000;" onclick="selectColor('#8B0000', this)" data-color="#8B0000"></div>
+                        <div class="color-option" style="background: #006400;" onclick="selectColor('#006400', this)" data-color="#006400"></div>
+                    </div>
+                </div>
+
+                <!-- Font Size -->
+                <div class="section" style="margin-top: 20px;">
+                    <h2>📏 Font Size</h2>
+                    <div class="control-group">
+                        <label>
+                            Adjust size: 
+                            <span class="slider-value" id="fontSizeValue">100</span>%
+                        </label>
+                        <input type="range" id="fontSize" min="80" max="150" value="100" step="10">
+                    </div>
+                </div>
+
+                <!-- Handwriting Style -->
+                <div class="section" style="margin-top: 20px;">
+                    <h2>✨ Handwriting Style</h2>
+                    <div class="control-group">
+                        <label>Select style:</label>
+                        <select id="styleSelect">
+                            <optgroup label="🟤 Rough / Human">
+                                <option value="style0">Style 0 - Rough Human</option>
+                                <option value="style1">Style 1 - Casual Human</option>
+                                <option value="style2">Style 2 - Natural Human</option>
+                            </optgroup>
+                            <optgroup label="🔵 Clear / Exam (Best)">
+                                <option value="style3" selected>Style 3 - Clean Exam</option>
+                                <option value="style4">Style 4 - Standard Exam</option>
+                                <option value="style5">Style 5 - Neat Exam</option>
+                                <option value="style6">Style 6 - Very Neat</option>
+                                <option value="style7">Style 7 - Formal Exam</option>
+                            </optgroup>
+                            <optgroup label="🟣 Stylized">
+                                <option value="style8">Style 8 - Stylized Display</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="generatePreview()">
+                        🔄 Preview
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetForm()">
+                        🔄 Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Preview -->
+            <div>
+                <div class="section" style="height: 100%;">
+                    <h2>🎨 Live Preview</h2>
+                    
+                    <div id="messageBox" class="message"></div>
+                    
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <p>Generating handwriting...</p>
+                    </div>
+
+                    <div class="preview-container">
+                        <div class="preview-placeholder" id="previewPlaceholder">
+                            <p style="font-size: 3em; margin-bottom: 10px;">👁️</p>
+                            <p style="font-size: 1.2em;">Preview will appear here</p>
+                            <p style="font-size: 0.9em; margin-top: 10px; color: #999;">Upload paper & generate to see handwriting on your background</p>
+                        </div>
+                        <img id="previewImage" alt="Preview">
+                    </div>
+
+                    <button class="btn btn-success" style="margin-top: 20px; width: 100%;" onclick="downloadPDF()" id="downloadBtn" disabled>
+                        📥 Download PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedColor = '#000000';
+        let paperImageBase64 = null;
+        let currentPreviewDataUrl = null; // holds latest preview for client-side PDF
+
+        document.getElementById('fontSize').addEventListener('input', function(e) {
+            document.getElementById('fontSizeValue').textContent = e.target.value;
+        });
+
+        function selectPageStyle(style) {
+            const customBtn = document.getElementById('btnCustom');
+            const whiteBtn = document.getElementById('btnWhite');
+            const uploadSection = document.getElementById('uploadSection');
+
+            if (style === 'custom') {
+                customBtn.classList.remove('btn-secondary');
+                customBtn.classList.add('btn-primary');
+                whiteBtn.classList.remove('btn-primary');
+                whiteBtn.classList.add('btn-secondary');
+                uploadSection.style.display = 'block';
+            } else {
+                whiteBtn.classList.remove('btn-secondary');
+                whiteBtn.classList.add('btn-primary');
+                customBtn.classList.remove('btn-primary');
+                customBtn.classList.add('btn-secondary');
+                uploadSection.style.display = 'none';
+                paperImageBase64 = null;
+            }
+        }
+
+        function selectColor(color, element) {
+            selectedColor = color;
+            document.querySelectorAll('.color-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+
+        function handlePaperUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                paperImageBase64 = e.target.result;
+                document.getElementById('paperPreview').src = paperImageBase64;
+                document.getElementById('paperPreview').classList.add('show');
+                document.getElementById('uploadPlaceholder').classList.add('hide');
+                document.getElementById('uploadArea').classList.add('has-image');
+                console.log('✅ Paper uploaded:', file.name);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function generatePreview() {
+            const text = document.getElementById('textInput').value.trim();
+            
+            if (!text) {
+                showMessage('❌ Please enter some text!', 'error');
+                return;
+            }
+
+            hideMessage();
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('previewImage').classList.remove('show');
+            document.getElementById('downloadBtn').disabled = true;
+
+            console.log('🎨 GENERATING PREVIEW');
+            console.log('Text length:', text.length);
+            console.log('Style:', document.getElementById('styleSelect').value);
+            console.log('Font size:', document.getElementById('fontSize').value);
+            console.log('Ink color:', selectedColor);
+            console.log('Background:', paperImageBase64 ? 'Custom' : 'None');
+
+            const data = {
+                text: text,
+                style: document.getElementById('styleSelect').value,
+                fontSize: parseInt(document.getElementById('fontSize').value),
+                inkColor: selectedColor,
+                backgroundImage: paperImageBase64 || ''
+            };
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    currentPreviewDataUrl = result.preview; // save for PDF
+                    document.getElementById('previewImage').src = result.preview;
+                    document.getElementById('previewImage').classList.add('show');
+                    document.getElementById('previewPlaceholder').classList.add('hide');
+                    document.getElementById('downloadBtn').disabled = false;
+                    showMessage('✅ Preview generated!', 'success');
+                    console.log('✅ Preview successful');
+                } else {
+                    showMessage('❌ Error: ' + result.message, 'error');
+                    console.error('❌ Generation error:', result.message);
+                }
+            } catch (error) {
+                showMessage('❌ Network error: ' + error.message, 'error');
+                console.error('❌ Network error:', error);
+            } finally {
+                document.getElementById('loading').classList.remove('show');
+            }
+        }
+
+        async function downloadPDF() {
+            if (!currentPreviewDataUrl) {
+                showMessage('❌ Please generate a preview first!', 'error');
+                return;
+            }
+
+            showMessage('⏳ Building PDF in browser...', 'success');
+            console.log('📄 Building PDF client-side...');
+
+            try {
+                const { jsPDF } = window.jspdf;
+
+                // --- Step 1: load the preview image into an <img> element ---
+                const img = new Image();
+                img.src = currentPreviewDataUrl;
+                await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
+
+                const srcW = img.naturalWidth;
+                const srcH = img.naturalHeight;
+                console.log(`✓ Source image: ${srcW}×${srcH}px`);
+
+                // --- Step 2: A4 dimensions in mm ---
+                const pageW = 210;   // mm
+                const pageH = 297;   // mm
+                // pixels-per-mm at the source image's native resolution
+                const pxPerMM = srcW / pageW;
+                const pageHeightPx = Math.round(pageH * pxPerMM);
+                const pagesNeeded  = Math.max(1, Math.ceil(srcH / pageHeightPx));
+                console.log(`✓ Pages: ${pagesNeeded}  |  pageHeightPx: ${pageHeightPx}`);
+
+                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+                // --- Step 3: for each page, draw a slice onto a canvas → JPEG ---
+                for (let p = 0; p < pagesNeeded; p++) {
+                    if (p > 0) pdf.addPage();
+
+                    const sliceY  = p * pageHeightPx;
+                    const sliceH  = Math.min(pageHeightPx, srcH - sliceY);  // may be shorter on last page
+                    const sliceHmm = (sliceH / pxPerMM);                    // real mm height of this slice
+
+                    // Off-screen canvas — draw only this page's slice
+                    const canvas = document.createElement('canvas');
+                    canvas.width  = srcW;
+                    canvas.height = sliceH;
+                    const ctx = canvas.getContext('2d');
+                    // White background so JPEG has no transparency artifacts
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, srcW, sliceH);
+                    ctx.drawImage(img, 0, sliceY, srcW, sliceH, 0, 0, srcW, sliceH);
+
+                    // Convert to JPEG (avoids the "corrupt PNG" jsPDF bug with large PNGs)
+                    const jpegData = canvas.toDataURL('image/jpeg', 0.92);
+
+                    // Place image to fill the full A4 width; height proportional to slice
+                    pdf.addImage(jpegData, 'JPEG', 0, 0, pageW, sliceHmm);
+
+                    // Subtle page number
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(150, 150, 150);
+                    pdf.text(String(p + 1), pageW / 2, pageH - 4, { align: 'center' });
+                }
+
+                // --- Step 4: trigger browser download (no server involved) ---
+                const filename = `handwritten_${Date.now()}.pdf`;
+                pdf.save(filename);
+
+                console.log('✅ PDF downloaded client-side:', filename);
+                celebrateDownload();
+                showMessage('✅ PDF downloaded!', 'success');
+
+            } catch (err) {
+                console.error('❌ PDF error:', err);
+                showMessage('❌ PDF error: ' + err.message, 'error');
+            }
+        }
+
+        function celebrateDownload() {
+            // 🎊 Confetti burst from multiple positions
+            const duration = 3000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                // Left side burst
+                confetti({
+                    particleCount: 7,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0, y: 0.6 }
+                });
+                
+                // Right side burst
+                confetti({
+                    particleCount: 7,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1, y: 0.6 }
+                });
+
+                // Center burst
+                confetti({
+                    particleCount: 10,
+                    angle: 90,
+                    spread: 70,
+                    origin: { x: 0.5, y: 0.5 }
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        function resetForm() {
+            if (!confirm('Reset all fields?')) return;
+            
+            document.getElementById('textInput').value = '';
+            document.getElementById('fontSize').value = 100;
+            document.getElementById('fontSizeValue').textContent = '100';
+            document.getElementById('styleSelect').value = 'style3';
+            
+            paperImageBase64 = null;
+            currentPreviewDataUrl = null;
+            document.getElementById('paperPreview').classList.remove('show');
+            document.getElementById('uploadPlaceholder').classList.remove('hide');
+            document.getElementById('uploadArea').classList.remove('has-image');
+            
+            document.getElementById('previewImage').classList.remove('show');
+            document.getElementById('previewPlaceholder').classList.remove('hide');
+            document.getElementById('downloadBtn').disabled = true;
+            
+            selectColor('#000000', document.querySelector('.color-option[data-color="#000000"]'));
+            
+            hideMessage();
+        }
+
+        function showMessage(text, type) {
+            const box = document.getElementById('messageBox');
+            box.textContent = text;
+            box.className = 'message show ' + type;
+        }
+
+        function hideMessage() {
+            document.getElementById('messageBox').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

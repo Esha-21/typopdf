@@ -1,0 +1,7 @@
+[[01/27/2026 04:12:45 PM]] 127.0.0.1 - - [27/Jan/2026 16:12:45] "POST /generate HTTP/1.1" 200 -
+[[01/27/2026 04:12:45 PM]] 127.0.0.1 - - [27/Jan/2026 16:12:45] "GET /output/result.svg?t=1769510565522 HTTP/1.1" 200 -
+[[01/27/2026 04:13:19 PM]] 127.0.0.1 - - [27/Jan/2026 16:13:19] "POST /generate HTTP/1.1" 200 -
+[[01/27/2026 04:13:19 PM]] 127.0.0.1 - - [27/Jan/2026 16:13:19] "GET /output/result.svg?t=1769510599664 HTTP/1.1" 200 -
+[[01/27/2026 04:14:29 PM]] 127.0.0.1 - - [27/Jan/2026 16:14:29] "GET /download-pdf HTTP/1.1" 200 -
+[[01/27/2026 04:14:29 PM]] 127.0.0.1 - - [27/Jan/2026 16:14:29] "GET /download-pdf HTTP/1.1" 200 -
+[[01/27/2026 04:50:56 PM]]  * Detected change in 'C:\\Users\\rajen\\Downloads\\handwriting-synthesis-master\\handwriting-synthesis-master\\app.py', reloading

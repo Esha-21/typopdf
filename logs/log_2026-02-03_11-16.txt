@@ -1,0 +1,6 @@
+[[02/03/2026 11:17:03 AM]] 127.0.0.1 - - [03/Feb/2026 11:17:03] "POST /generate HTTP/1.1" 200 -
+[[02/03/2026 11:17:03 AM]] 127.0.0.1 - - [03/Feb/2026 11:17:03] "GET /output/handwriting_transparent.png?t=1770097607 HTTP/1.1" 200 -
+[[02/03/2026 11:18:26 AM]] 127.0.0.1 - - [03/Feb/2026 11:18:26] "POST /generate HTTP/1.1" 200 -
+[[02/03/2026 11:18:27 AM]] 127.0.0.1 - - [03/Feb/2026 11:18:27] "GET /output/handwriting_transparent.png?t=1770097691 HTTP/1.1" 200 -
+[[02/03/2026 11:18:45 AM]] 127.0.0.1 - - [03/Feb/2026 11:18:45] "POST /download-pdf HTTP/1.1" 200 -
+[[02/03/2026 11:50:40 AM]]  * Detected change in 'C:\\Users\\rajen\\Downloads\\handwriting-synthesis-master\\handwriting-synthesis-master\\app.py', reloading
