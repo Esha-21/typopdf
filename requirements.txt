@@ -13,3 +13,7 @@ tensorflow==1.15.0
 svgwrite
 scipy
 matplotlib
+h5py
+scikit-learn
+pandas
+protobuf==3.20.0
