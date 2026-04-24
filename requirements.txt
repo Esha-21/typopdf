@@ -1,6 +1,15 @@
+# flask
+# numpy
+# pillow
+# reportlab
+# opencv-python-headless
+# tensorflow==1.15.0
 flask
 numpy
 pillow
 reportlab
 opencv-python-headless
 tensorflow==1.15.0
+svgwrite
+scipy
+matplotlib
