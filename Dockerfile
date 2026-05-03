@@ -15,8 +15,12 @@ FROM python:3.7
 WORKDIR /app
 COPY . /app
 
-# Install Inkscape (VERY IMPORTANT)
-RUN apt-get update && apt-get install -y inkscape
+# Install system dependencies for inkscape
+RUN apt-get update && apt-get install -y \
+    inkscape \
+    libgl1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
