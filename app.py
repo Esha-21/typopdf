@@ -972,15 +972,16 @@ def api_generate():
         print(f"   DPI: {dpi}")
         print(f"   Command: {' '.join(cmd)}")
         
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        # result = subprocess.run(cmd, capture_output=True, text=True)
         
-        if not os.path.exists(PNG_ORIGINAL):
-            raise Exception(f"Inkscape conversion failed: {result.stderr}")
+        # if not os.path.exists(PNG_ORIGINAL):
+        #     raise Exception(f"Inkscape conversion failed: {result.stderr}")
         
-        print(f"✅ PNG created: {PNG_ORIGINAL}")
+        # print(f"✅ PNG created: {PNG_ORIGINAL}")
         
-        # Extract transparent PNG
-        print(f"\n🎨 EXTRACTING TRANSPARENT PNG")
+        # # Extract transparent PNG
+        # print(f"\n🎨 EXTRACTING TRANSPARENT PNG")
+        print("⚠️ Skipping Inkscape conversion (debug mode)")
         if not extract_png_transparent(PNG_ORIGINAL, PNG_TRANSPARENT):
             raise Exception("Failed to extract transparent PNG")
         
