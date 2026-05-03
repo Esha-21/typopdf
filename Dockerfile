@@ -15,9 +15,10 @@ FROM python:3.7
 WORKDIR /app
 COPY . /app
 
-RUN pip install --upgrade pip
+# Install Inkscape (VERY IMPORTANT)
+RUN apt-get update && apt-get install -y inkscape
 
-# Install all dependencies (include tensorflow here)
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 EXPOSE 5000

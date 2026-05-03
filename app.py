@@ -584,7 +584,8 @@ COMPOSITE_PREVIEW = os.path.join(OUTPUT_DIR, "preview.png")
 # Constants
 PAGE_WIDTH, PAGE_HEIGHT = A4
 A4_300DPI = (2480, 3508)  # Width x Height at 300 DPI
-INKSCAPE = r"C:\Program Files\Inkscape\bin\inkscape.exe"
+# INKSCAPE = r"C:\Program Files\Inkscape\bin\inkscape.exe"
+INKSCAPE = "inkscape"
 
 STYLES = {
     # 🟤 Group A: Rough / Human (Readable, not exam)
