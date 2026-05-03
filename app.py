@@ -559,7 +559,11 @@ from reportlab.lib.utils import ImageReader
 import io
 
 import cv2
-from demo import generate_handwriting
+
+try :
+    from demo import generate_handwriting
+except Exception as e:
+    print(" error importing demo",e)
 
 # ===============================================
 # CONFIGURATION
@@ -585,7 +589,7 @@ COMPOSITE_PREVIEW = os.path.join(OUTPUT_DIR, "preview.png")
 PAGE_WIDTH, PAGE_HEIGHT = A4
 A4_300DPI = (2480, 3508)  # Width x Height at 300 DPI
 # INKSCAPE = r"C:\Program Files\Inkscape\bin\inkscape.exe"
-INKSCAPE = "inkscape"
+INKSCAPE = None
 
 STYLES = {
     # 🟤 Group A: Rough / Human (Readable, not exam)
@@ -891,7 +895,8 @@ def sanitize_text(text):
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return "server is running"
+    # return render_template("index.html")
 
 
 @app.route("/generate", methods=["POST"])
